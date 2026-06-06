@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Neovim Cheat Sheet — Landscape</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --cyan: #79c0ff;
+    --green: #56d364;
+    --yellow: #e3b341;
+    --orange: #ffa657;
+    --pink: #ff7b72;
+    --purple: #d2a8ff;
+    --text: #c9d1d9;
+    --muted: #6e7681;
+    --white: #f0f6fc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .page {
+    width: 297mm;
+    height: 210mm;
+    background: var(--bg);
+    color: var(--text);
+    padding: 7mm 8mm;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 3mm;
+  }
+
+  /* grid lines bg */
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(121,192,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(121,192,255,0.025) 1px, transparent 1px);
+    background-size: 18px 18px;
+    pointer-events: none;
+  }
+
+  /* corner accents */
+  .corner { position: absolute; width: 20px; height: 20px; border-color: var(--cyan); border-style: solid; opacity: 0.4; }
+  .corner.tl { top: 6mm; left: 6mm; border-width: 2px 0 0 2px; }
+  .corner.tr { top: 6mm; right: 6mm; border-width: 2px 2px 0 0; }
+  .corner.bl { bottom: 6mm; left: 6mm; border-width: 0 0 2px 2px; }
+  .corner.br { bottom: 6mm; right: 6mm; border-width: 0 2px 2px 0; }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 3mm;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .logo-area { display: flex; align-items: center; gap: 8px; }
+
+  .nvim-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #56d364, #79c0ff);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 800; color: #0d1117;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: var(--white); letter-spacing: -0.5px; line-height: 1;
+  }
+  h1 span { color: var(--green); }
+
+  .subtitle { font-size: 7.5px; color: var(--muted); margin-top: 2px; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 7px;
+    font-size: 7.5px;
+    color: var(--cyan);
+  }
+
+  .plugin-tag {
+    font-size: 7px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--purple);
+  }
+
+  /* ── MAIN COLUMNS ── */
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3mm;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-header {
+    padding: 3px 7px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .dot-cyan   { background: var(--cyan); }
+  .dot-green  { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-orange { background: var(--orange); }
+  .dot-pink   { background: var(--pink); }
+  .dot-purple { background: var(--purple); }
+
+  .card-title {
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .title-cyan   { color: var(--cyan); }
+  .title-green  { color: var(--green); }
+  .title-yellow { color: var(--yellow); }
+  .title-orange { color: var(--orange); }
+  .title-pink   { color: var(--pink); }
+  .title-purple { color: var(--purple); }
+
+  .card-body {
+    padding: 4px 7px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── KEY ROWS ── */
+  .krow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 1.2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    gap: 3px;
+  }
+  .krow:last-child { border-bottom: none; }
+
+  .key {
+    font-size: 7.5px; font-weight: 600;
+    color: var(--white); white-space: nowrap; flex-shrink: 0;
+  }
+
+  .key kbd {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0 2.5px;
+    font-size: 7px;
+    color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace;
+    margin: 0 0.5px;
+    line-height: 1.4;
+  }
+
+  .desc {
+    font-size: 7px;
+    color: var(--muted);
+    text-align: right;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mini-divider { border: none; border-top: 1px solid var(--border); margin: 2px 0; }
+
+  /* modes grid */
+  .modes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    padding: 4px 7px;
+  }
+
+  .mode-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 5px;
+    text-align: center;
+  }
+
+  .mode-key   { font-size: 10px; font-weight: 800; display: block; line-height: 1; }
+  .mode-name  { font-size: 6.5px; color: var(--muted); display: block; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1px; }
+  .mode-enter { font-size: 6.5px; font-weight: 600; display: block; margin-top: 1px; }
+
+  /* verb+motion two-col inside card */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 6px;
+  }
+
+  .mini-section-title {
+    font-size: 6.5px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.08em; border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5px; margin-bottom: 2px; margin-top: 3px;
+  }
+  .mini-section-title:first-child { margin-top: 0; }
+
+  .combo-row {
+    display: flex; justify-content: space-between; align-items: baseline; padding: 1px 0;
+  }
+  .combo-key  { font-size: 7.5px; font-weight: 600; color: var(--orange); }
+  .combo-desc { font-size: 6.5px; color: var(--muted); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 2.5mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .footer-tip { font-size: 7px; color: var(--muted); }
+  .footer-tip span { color: var(--green); font-weight: 600; }
+  .footer-tip kbd {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 2px; padding: 0 3px; font-size: 6.5px;
+    color: var(--cyan); font-family: monospace;
+  }
+
+  @media print {
+    body { background: none; padding: 0; }
+    .page {
+      width: 297mm; height: 210mm;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    @page { size: A4 landscape; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-area">
+      <div class="nvim-icon">N</div>
+      <div>
+        <h1>Neo<span>vim</span> Cheat Sheet</h1>
+        <div class="subtitle">Quick Reference · v0.11.6 · lazy.nvim setup</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="badge">v0.11.6</span>
+      <span class="plugin-tag">treesitter</span>
+      <span class="plugin-tag">telescope</span>
+      <span class="plugin-tag">neo-tree</span>
+      <span class="plugin-tag">lazy.nvim</span>
+    </div>
+  </header>
+
+  <!-- COLUMNS -->
+  <div class="columns">
+
+    <!-- COL 1: Modes + Insert -->
+    <div style="display:flex; flex-direction:column; gap:3mm;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot dot-cyan"></div>
+          <span class="card-title title-cyan">Modes</span>
+        </div>
+        <div class="modes-grid">
+          <div class="mode-pill">
+            <span class="mode-key" style="color:var(--cyan)">N</span>
+            <span class="mode-name">Normal</span>
+            <span class="mode-enter" style="color:var(--muted)">Esc</span>
+          </div>
+          <div class="mode-pill">
+            <span class="mode-key" style="color:var(--green)">I</span>
+            <span class="mode-name">Insert</span>
+            <span class="mode-enter" style="color:var(--green)">i / a / o</span>
+          </div>
+          <div class="mode-pill">
+            <span class="mode-key" style="color:var(--yellow)">V</span>
+            <span class="mode-name">Visual</span>
+            <span class="mode-enter" style="color:var(--yellow)">v / V / ^v</span>
+          </div>
+          <div class="mode-pill">
+            <span class="mode-key" style="color:var(--orange)">C</span>
+            <span class="mode-name">Command</span>
+            <span class="mode-enter" style="color:var(--orange)">:</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1;">
+        <div class="card-header">
+          <div class="dot dot-yellow"></div>
+          <span class="card-title title-yellow">Insert Entry</span>
+        </div>
+        <div class="card-body">
+          <div class="krow"><span class="key"><kbd>i</kbd></span><span class="desc">before cursor</span></div>
+          <div class="krow"><span class="key"><kbd>I</kbd></span><span class="desc">line start</span></div>
+          <div class="krow"><span class="key"><kbd>a</kbd></span><span class="desc">after cursor</span></div>
+          <div class="krow"><span class="key"><kbd>A</kbd></span><span class="desc">line end</span></div>
+          <div class="krow"><span class="key"><kbd>o</kbd></span><span class="desc">new line below</span></div>
+          <div class="krow"><span class="key"><kbd>O</kbd></span><span class="desc">new line above</span></div>
+          <div class="krow"><span class="key"><kbd>s</kbd></span><span class="desc">delete char + insert</span></div>
+          <div class="krow"><span class="key"><kbd>S</kbd></span><span class="desc">delete line + insert</span></div>
+          <div class="krow"><span class="key"><kbd>C</kbd></span><span class="desc">change to end</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COL 2: Navigation -->
+    <div class="card">
+      <div class="card-header">
+        <div class="dot dot-green"></div>
+        <span class="card-title title-green">Navigation</span>
+      </div>
+      <div class="card-body">
+        <div class="krow"><span class="key"><kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd></span><span class="desc">← ↓ ↑ →</span></div>
+        <div class="krow"><span class="key"><kbd>w</kbd> / <kbd>b</kbd></span><span class="desc">next / prev word</span></div>
+        <div class="krow"><span class="key"><kbd>e</kbd></span><span class="desc">end of word</span></div>
+        <div class="krow"><span class="key"><kbd>0</kbd> / <kbd>$</kbd></span><span class="desc">line start / end</span></div>
+        <div class="krow"><span class="key"><kbd>^</kbd></span><span class="desc">first non-blank</span></div>
+        <div class="krow"><span class="key"><kbd>gg</kbd> / <kbd>G</kbd></span><span class="desc">file top / bottom</span></div>
+        <div class="krow"><span class="key"><kbd>50G</kbd></span><span class="desc">go to line 50</span></div>
+        <div class="krow"><span class="key"><kbd>{</kbd> / <kbd>}</kbd></span><span class="desc">paragraph up/down</span></div>
+        <div class="krow"><span class="key"><kbd>%</kbd></span><span class="desc">matching bracket</span></div>
+        <div class="krow"><span class="key"><kbd>Ctrl</kbd>+<kbd>d</kbd>/<kbd>u</kbd></span><span class="desc">half page scroll</span></div>
+        <div class="krow"><span class="key"><kbd>Ctrl</kbd>+<kbd>f</kbd>/<kbd>b</kbd></span><span class="desc">full page scroll</span></div>
+        <div class="krow"><span class="key"><kbd>zz</kbd></span><span class="desc">center cursor line</span></div>
+        <div class="krow"><span class="key"><kbd>Ctrl</kbd>+<kbd>o</kbd>/<kbd>i</kbd></span><span class="desc">jump back / forward</span></div>
+        <div class="krow"><span class="key"><kbd>H</kbd> / <kbd>M</kbd> / <kbd>L</kbd></span><span class="desc">top / mid / bot screen</span></div>
+        <div class="krow"><span class="key"><kbd>f</kbd>+<kbd>x</kbd></span><span class="desc">jump to char x</span></div>
+      </div>
+    </div>
+
+    <!-- COL 3: Editing + Search -->
+    <div style="display:flex; flex-direction:column; gap:3mm;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot dot-pink"></div>
+          <span class="card-title title-pink">Editing</span>
+        </div>
+        <div class="card-body">
+          <div class="krow"><span class="key"><kbd>dd</kbd></span><span class="desc">delete line</span></div>
+          <div class="krow"><span class="key"><kbd>D</kbd></span><span class="desc">delete to end</span></div>
+          <div class="krow"><span class="key"><kbd>yy</kbd></span><span class="desc">yank line</span></div>
+          <div class="krow"><span class="key"><kbd>p</kbd> / <kbd>P</kbd></span><span class="desc">paste below / above</span></div>
+          <div class="krow"><span class="key"><kbd>u</kbd></span><span class="desc">undo</span></div>
+          <div class="krow"><span class="key"><kbd>Ctrl</kbd>+<kbd>r</kbd></span><span class="desc">redo</span></div>
+          <div class="krow"><span class="key"><kbd>.</kbd></span><span class="desc">repeat last action ★</span></div>
+          <div class="krow"><span class="key"><kbd>x</kbd></span><span class="desc">delete char</span></div>
+          <div class="krow"><span class="key"><kbd>~</kbd></span><span class="desc">toggle case</span></div>
+          <div class="krow"><span class="key"><kbd>J</kbd></span><span class="desc">join line below</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1;">
+        <div class="card-header">
+          <div class="dot dot-orange"></div>
+          <span class="card-title title-orange">Search & Replace</span>
+        </div>
+        <div class="card-body">
+          <div class="krow"><span class="key"><kbd>/word</kbd></span><span class="desc">search forward</span></div>
+          <div class="krow"><span class="key"><kbd>?word</kbd></span><span class="desc">search backward</span></div>
+          <div class="krow"><span class="key"><kbd>n</kbd> / <kbd>N</kbd></span><span class="desc">next / prev match</span></div>
+          <div class="krow"><span class="key"><kbd>*</kbd> / <kbd>#</kbd></span><span class="desc">search word fwd/bwd</span></div>
+          <div class="krow"><span class="key"><kbd>:noh</kbd></span><span class="desc">clear highlights</span></div>
+          <hr class="mini-divider">
+          <div class="krow"><span class="key" style="font-size:6.5px;"><kbd>:%s/old/new/g</kbd></span><span class="desc">replace all</span></div>
+          <div class="krow"><span class="key" style="font-size:6.5px;"><kbd>:%s/old/new/gc</kbd></span><span class="desc">with confirm</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COL 4: Verb+Motion + Visual -->
+    <div style="display:flex; flex-direction:column; gap:3mm;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot dot-yellow"></div>
+          <span class="card-title title-yellow">Verb + Motion</span>
+        </div>
+        <div class="card-body">
+          <div class="two-col">
+            <div>
+              <div class="mini-section-title">Verbs</div>
+              <div class="combo-row"><span class="combo-key">d</span><span class="combo-desc">delete</span></div>
+              <div class="combo-row"><span class="combo-key">c</span><span class="combo-desc">change</span></div>
+              <div class="combo-row"><span class="combo-key">y</span><span class="combo-desc">yank</span></div>
+              <div class="combo-row"><span class="combo-key">v</span><span class="combo-desc">select</span></div>
+              <div class="mini-section-title">i / a</div>
+              <div class="combo-row"><span class="combo-key">i"</span><span class="combo-desc">inside quotes</span></div>
+              <div class="combo-row"><span class="combo-key">a"</span><span class="combo-desc">around quotes</span></div>
+              <div class="combo-row"><span class="combo-key">i{</span><span class="combo-desc">inside braces</span></div>
+              <div class="combo-row"><span class="combo-key">ip</span><span class="combo-desc">inner paragraph</span></div>
+            </div>
+            <div>
+              <div class="mini-section-title">Examples</div>
+              <div class="combo-row"><span class="combo-key">dw</span><span class="combo-desc">delete word</span></div>
+              <div class="combo-row"><span class="combo-key">d$</span><span class="combo-desc">delete → end</span></div>
+              <div class="combo-row"><span class="combo-key">ci"</span><span class="combo-desc">change in quotes</span></div>
+              <div class="combo-row"><span class="combo-key">yip</span><span class="combo-desc">yank paragraph</span></div>
+              <div class="combo-row"><span class="combo-key">ca{</span><span class="combo-desc">change + braces</span></div>
+              <div class="combo-row"><span class="combo-key">gg=G</span><span class="combo-desc">indent whole file</span></div>
+              <div class="combo-row"><span class="combo-key">viw</span><span class="combo-desc">select word</span></div>
+              <div class="combo-row"><span class="combo-key">dit</span><span class="combo-desc">delete HTML tag</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1;">
+        <div class="card-header">
+          <div class="dot dot-purple"></div>
+          <span class="card-title title-purple">Visual Mode</span>
+        </div>
+        <div class="card-body">
+          <div class="krow"><span class="key"><kbd>v</kbd></span><span class="desc">char select</span></div>
+          <div class="krow"><span class="key"><kbd>V</kbd></span><span class="desc">line select</span></div>
+          <div class="krow"><span class="key"><kbd>Ctrl</kbd>+<kbd>v</kbd></span><span class="desc">block select</span></div>
+          <div class="krow"><span class="key"><kbd>&gt;</kbd> / <kbd>&lt;</kbd></span><span class="desc">indent / unindent</span></div>
+          <div class="krow"><span class="key"><kbd>u</kbd> / <kbd>U</kbd></span><span class="desc">lower / upper case</span></div>
+          <div class="krow"><span class="key"><kbd>~</kbd></span><span class="desc">toggle case</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COL 5: Files + Splits + Plugins -->
+    <div style="display:flex; flex-direction:column; gap:3mm;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot dot-cyan"></div>
+          <span class="card-title title-cyan">Files & Buffers</span>
+        </div>
+        <div class="card-body">
+          <div class="krow"><span class="key"><kbd>:w</kbd></span><span class="desc">save</span></div>
+          <div class="krow"><span class="key"><kbd>:q</kbd> / <kbd>:q!</kbd></span><span class="desc">quit / force quit</span></div>
+          <div class="krow"><span class="key"><kbd>:wq</kbd></span><span class="desc">save & quit</span></div>
+          <div class="krow"><span class="key"><kbd>:bn</kbd> / <kbd>:bp</kbd></span><span class="desc">next / prev buffer</span></div>
+          <div class="krow"><span class="key"><kbd>:bd</kbd></span><span class="desc">close buffer</span></div>
+          <hr class="mini-divider">
+          <div class="krow"><span class="key"><kbd>:vsplit</kbd></span><span class="desc">vertical split</span></div>
+          <div class="krow"><span class="key"><kbd>:split</kbd></span><span class="desc">horizontal split</span></div>
+          <div class="krow"><span class="key"><kbd>^w w</kbd></span><span class="desc">switch window</span></div>
+          <div class="krow"><span class="key"><kbd>^w h/l</kbd></span><span class="desc">left / right</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot dot-green"></div>
+          <span class="card-title title-green">Your Keybinds</span>
+        </div>
+        <div class="card-body">
+          <div class="krow"><span class="key"><kbd>&lt;leader&gt;ff</kbd></span><span class="desc">find files</span></div>
+          <div class="krow"><span class="key"><kbd>&lt;leader&gt;fg</kbd></span><span class="desc">live grep</span></div>
+          <div class="krow"><span class="key"><kbd>Ctrl</kbd>+<kbd>b</kbd></span><span class="desc">toggle neo-tree</span></div>
+          <div class="krow"><span class="key"><kbd>&lt;leader&gt;e</kbd></span><span class="desc">toggle neo-tree (alt)</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1;">
+        <div class="card-header">
+          <div class="dot dot-purple"></div>
+          <span class="card-title title-purple">Lazy & Misc</span>
+        </div>
+        <div class="card-body">
+          <div class="krow"><span class="key"><kbd>:Lazy</kbd></span><span class="desc">plugin manager</span></div>
+          <div class="krow"><span class="key"><kbd>:Lazy sync</kbd></span><span class="desc">install + update</span></div>
+          <div class="krow"><span class="key"><kbd>:checkhealth</kbd></span><span class="desc">diagnose</span></div>
+          <div class="krow"><span class="key"><kbd>q:</kbd></span><span class="desc">command history</span></div>
+          <div class="krow"><span class="key"><kbd>:earlier 5m</kbd></span><span class="desc">undo 5 min</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-tip">
+      <span>Leader</span> = <kbd>Space</kbd> &nbsp;·&nbsp;
+      <span>.</span> repeats last action — use it constantly &nbsp;·&nbsp;
+      <span>vimtutor</span> in terminal for interactive basics &nbsp;·&nbsp;
+      <span>:help keyword</span> for anything
+    </div>
+    <div style="font-size:7px; color:var(--muted);">A4 Landscape · print with background graphics enabled</div>
+  </footer>
+</div>
+</body>
+</html>
